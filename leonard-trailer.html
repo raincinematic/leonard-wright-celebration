@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leonard Wright — A Private Celebration</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+      font-family: 'Inter', system-ui, sans-serif;
+      color: #f5f0e8;
+    }
+
+    .stage {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
+
+    #hero {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0;
+      transition: opacity 1.8s ease;
+    }
+
+    #hero.ready {
+      opacity: 1;
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center, transparent 28%, rgba(0,0,0,0.58) 100%),
+        linear-gradient(to bottom, rgba(10,8,5,0.28) 0%, transparent 42%, rgba(8,6,4,0.5) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .tint {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(180,110,40,0.09), transparent 55%, rgba(20,30,60,0.14));
+      mix-blend-mode: soft-light;
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .layer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      padding: 2rem;
+    }
+
+    .layer.active {
+      opacity: 1;
+      transition: opacity 1.2s ease;
+    }
+
+    .layer.exit {
+      opacity: 0;
+      transition: opacity 0.9s ease;
+    }
+
+    .eyebrow {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.68rem, 1.3vw, 0.82rem);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.72);
+      margin-bottom: 1.25rem;
+    }
+
+    .title {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(2.3rem, 6.2vw, 4.3rem);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      color: #f8f4ec;
+      text-shadow: 0 2px 28px rgba(0,0,0,0.45);
+      max-width: 14ch;
+    }
+
+    .subtitle {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.1rem, 2.6vw, 1.55rem);
+      letter-spacing: 0.04em;
+      color: rgba(245,240,232,0.88);
+      margin-top: 1rem;
+      max-width: 26ch;
+    }
+
+    .details {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.82rem, 1.7vw, 1rem);
+      line-height: 1.8;
+      letter-spacing: 0.055em;
+      color: rgba(245,240,232,0.84);
+      margin-top: 1.8rem;
+    }
+
+    .details strong {
+      font-weight: 500;
+      color: #f8f4ec;
+      letter-spacing: 0.07em;
+    }
+
+    .divider {
+      width: 42px;
+      height: 1px;
+      background: rgba(245,240,232,0.35);
+      margin: 1.4rem auto;
+    }
+
+    .logo-wrap {
+      position: absolute;
+      bottom: 7.5%;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 12;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    .logo-wrap.show {
+      opacity: 0.88;
+    }
+
+    .logo-wrap svg {
+      height: clamp(17px, 3vw, 24px);
+      width: auto;
+      filter: drop-shadow(0 2px 12px rgba(0,0,0,0.4));
+    }
+
+    .controls {
+      position: absolute;
+      bottom: 1.6rem;
+      right: 1.6rem;
+      z-index: 30;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .controls.visible {
+      opacity: 0.75;
+    }
+
+    .controls:hover {
+      opacity: 1;
+    }
+
+    .replay-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.92);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+    }
+
+    .replay-btn:hover {
+      background: rgba(255,255,255,0.15);
+      border-color: rgba(255,255,255,0.35);
+    }
+
+    .loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0a0a0a;
+      z-index: 50;
+      transition: opacity 0.7s ease;
+    }
+
+    .loader.done {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loader-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+      font-size: 0.72rem;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.5);
+    }
+
+    .progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 2px;
+      background: rgba(251,133,0,0.75);
+      width: 0%;
+      z-index: 40;
+      transition: width 0.08s linear;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="loader" id="loader">
+      <div class="loader-text">Preparing</div>
+    </div>
+
+    <video id="hero" muted loop playsinline preload="auto">
+      <source src="atlanta-hero.mp4" type="video/mp4" />
+    </video>
+
+    <div class="overlay"></div>
+    <div class="tint"></div>
+
+    <!-- Sequence layers (30s total) -->
+    <div class="layer" id="layer1">
+      <div class="eyebrow">Atlanta</div>
+    </div>
+
+    <div class="layer" id="layer2">
+      <div class="eyebrow">Thirty-Three Years</div>
+      <div class="title">Built.<br>Led.<br>Delivered.</div>
+    </div>
+
+    <div class="layer" id="layer3">
+      <div class="eyebrow">A Private Celebration</div>
+      <div class="title">Leonard Wright</div>
+      <div class="subtitle">Honoring a lifetime of quiet excellence</div>
+    </div>
+
+    <div class="layer" id="layer4">
+      <div class="title" style="font-size: clamp(1.7rem, 4.2vw, 2.9rem); max-width: 18ch;">
+        Summerour Studio
+      </div>
+      <div class="divider"></div>
+      <div class="details">
+        409 Bishop Street NW<br>
+        Atlanta, Georgia 30318<br><br>
+        <strong>August 21, 2026 &nbsp;·&nbsp; 6:00 PM</strong><br>
+        Attire: Dress to Impress
+      </div>
+    </div>
+
+    <div class="logo-wrap" id="logo">
+      <svg width="158" height="28" viewBox="0 0 158 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="INPAX">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M34.654 26.7491V0.276344H29.7731V26.7491H34.654ZM60.1394 16.6894L47.3595 0.276344H43.3727V26.7491H48.2909V8.89889L62.0024 26.7869V26.7491H65.0576V0.238525H60.1394V16.6894ZM78.2102 5.00362H85.5875C91.8471 5.00362 91.8843 14.3825 85.5875 14.3825H78.2102V5.00362ZM85.5875 0.238525C81.489 0.238525 77.3904 0.276344 73.2919 0.276344V26.7491H78.2102V18.9585H85.5875C98.3674 18.9585 98.3302 0.238525 85.5875 0.238525ZM122.921 26.7491H128.287L116.587 0.276344H111.222L99.5225 26.7491H104.851L107.086 21.7571H120.723L122.921 26.7491ZM118.748 17.1054H109.061L113.905 5.83562L118.748 17.1054ZM145.016 10.1469L138.496 0.276344H133.093V0.503253L141.886 13.3614L132.832 26.5978V26.7491H138.347L145.016 16.8029L151.685 26.7491H157.2V26.5978L148.109 13.3614L156.939 0.503253V0.276344H151.536L145.016 10.1469Z" fill="#f5f0e8"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H5.73013L15.0367 13.5952L5.73013 27.1904H0L9.45683 13.584L0 0Z" fill="#FB8500"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M7.72415 0H13.4543L22.7609 13.5952L13.4543 27.1904H7.72415L17.181 13.584L7.72415 0Z" fill="#FB8500"/>
+      </svg>
+    </div>
+
+    <div class="progress" id="progress"></div>
+
+    <div class="controls" id="controls">
+      <button class="replay-btn" id="replay">Replay</button>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('hero');
+    const loader = document.getElementById('loader');
+    const progress = document.getElementById('progress');
+    const logo = document.getElementById('logo');
+    const controls = document.getElementById('controls');
+    const layers = [
+      document.getElementById('layer1'),
+      document.getElementById('layer2'),
+      document.getElementById('layer3'),
+      document.getElementById('layer4')
+    ];
+
+    // 30-second sequence
+    const sequence = [
+      { layer: 0, start: 1.0,  end: 5.5  },   // Atlanta
+      { layer: 1, start: 6.5,  end: 13.0 },   // Built. Led. Delivered.
+      { layer: 2, start: 14.0, end: 20.5 },   // Leonard Wright
+      { layer: 3, start: 21.5, end: 30.0 }    // Event details
+    ];
+
+    const TOTAL = 30;
+    let startTime = null;
+    let animId = null;
+    let playing = false;
+
+    function showLayer(index) {
+      layers.forEach((l, i) => {
+        l.classList.remove('active', 'exit');
+        if (i === index) l.classList.add('active');
+      });
+    }
+
+    function hideAllLayers() {
+      layers.forEach(l => {
+        l.classList.remove('active');
+        l.classList.add('exit');
+      });
+    }
+
+    function tick(now) {
+      if (!startTime) startTime = now;
+      const elapsed = (now - startTime) / 1000;
+
+      progress.style.width = Math.min(100, (elapsed / TOTAL) * 100) + '%';
+
+      let active = -1;
+      for (const s of sequence) {
+        if (elapsed >= s.start && elapsed < s.end) {
+          active = s.layer;
+          break;
+        }
+      }
+
+      if (active >= 0) {
+        showLayer(active);
+      } else {
+        hideAllLayers();
+      }
+
+      if (elapsed >= 22) {
+        logo.classList.add('show');
+      } else {
+        logo.classList.remove('show');
+      }
+
+      if (elapsed >= TOTAL - 5) {
+        controls.classList.add('visible');
+      }
+
+      if (elapsed < TOTAL) {
+        animId = requestAnimationFrame(tick);
+      } else {
+        playing = false;
+        controls.classList.add('visible');
+      }
+    }
+
+    function startSequence() {
+      if (playing) return;
+      playing = true;
+      startTime = null;
+      progress.style.width = '0%';
+      logo.classList.remove('show');
+      controls.classList.remove('visible');
+      hideAllLayers();
+      video.currentTime = 0;
+      video.play().catch(() => {});
+      animId = requestAnimationFrame(tick);
+    }
+
+    video.addEventListener('canplaythrough', () => {
+      loader.classList.add('done');
+      video.classList.add('ready');
+      setTimeout(startSequence, 500);
+    }, { once: true });
+
+    if (video.readyState >= 3) {
+      loader.classList.add('done');
+      video.classList.add('ready');
+      setTimeout(startSequence, 500);
+    }
+
+    document.getElementById('replay').addEventListener('click', () => {
+      cancelAnimationFrame(animId);
+      startSequence();
+    });
+
+    video.addEventListener('ended', () => {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    });
+  </script>
+</body>
+</html>
