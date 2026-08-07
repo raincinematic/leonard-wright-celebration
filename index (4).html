@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leonard Wright — A Private Celebration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --black: #0a0908;
+      --cream: #F5F1E6;
+      --gold: #C9A84C;
+      --gold-soft: #E2CA8A;
+      --muted: rgba(245,241,230,0.55);
+    }
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--black);
+      color: var(--cream);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    #stage { position: fixed; inset: 0; background: var(--black); }
+
+    .scene {
+      position: absolute; inset: 0;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none;
+    }
+    .scene.active { opacity: 1; pointer-events: auto; }
+
+    .scene-bg {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .scene-overlay {
+      position: absolute; inset: 0;
+      background: rgba(10,9,8,0.48);
+    }
+
+    .scene-text {
+      position: relative; z-index: 10;
+      text-align: center; padding: 2rem;
+      max-width: 90vw;
+    }
+
+    .eyebrow {
+      font-size: clamp(0.55rem, 1.25vw, 0.75rem);
+      font-weight: 400; letter-spacing: 0.36em;
+      text-transform: uppercase; color: var(--gold);
+      display: block; margin-bottom: 1.1rem;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 1s ease 0.7s, transform 1s ease 0.7s;
+    }
+    .active .eyebrow { opacity: 1; transform: none; }
+
+    .headline {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 400;
+      font-size: clamp(2.4rem, 7vw, 4.8rem);
+      line-height: 1.12;
+      letter-spacing: 0.01em;
+      color: var(--cream);
+      opacity: 0; transform: translateY(18px);
+      transition: opacity 1.15s ease 0.95s, transform 1.15s ease 0.95s;
+    }
+    .active .headline { opacity: 1; transform: none; }
+    .headline em {
+      font-style: italic;
+      font-weight: 300;
+      color: var(--gold-soft);
+    }
+
+    .sub {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-weight: 300;
+      font-size: clamp(1.05rem, 2.4vw, 1.45rem);
+      letter-spacing: 0.03em;
+      color: rgba(245,241,230,0.85);
+      margin-top: 1.1rem;
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 1s ease 1.25s, transform 1s ease 1.25s;
+    }
+    .active .sub { opacity: 1; transform: none; }
+
+    .gold-rule {
+      width: 42px; height: 1px;
+      background: var(--gold);
+      margin: 1.4rem auto 0;
+      opacity: 0;
+      transition: opacity 0.9s ease 1.35s;
+    }
+    .active .gold-rule { opacity: 0.7; }
+
+    /* Event details card */
+    .details-card {
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.82rem, 1.7vw, 1.05rem);
+      line-height: 1.85;
+      letter-spacing: 0.06em;
+      color: rgba(245,241,230,0.88);
+      margin-top: 1.8rem;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 1s ease 1.3s, transform 1s ease 1.3s;
+    }
+    .active .details-card { opacity: 1; transform: none; }
+    .details-card strong {
+      font-weight: 500;
+      color: var(--cream);
+      letter-spacing: 0.08em;
+    }
+
+    /* End card */
+    .end-card {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 10;
+    }
+    .end-logo {
+      height: clamp(22px, 4vw, 32px);
+      width: auto;
+      opacity: 0;
+      transition: opacity 1.6s ease 0.6s;
+      margin-bottom: 1.8rem;
+    }
+    .active .end-logo { opacity: 0.55; } /* translucent as requested */
+
+    .end-tagline {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      color: var(--cream);
+      opacity: 0; transform: translateY(14px);
+      transition: opacity 1.2s ease 1s, transform 1.2s ease 1s;
+      margin-bottom: 0.6rem;
+    }
+    .active .end-tagline { opacity: 1; transform: none; }
+
+    .end-sub {
+      font-size: clamp(0.6rem, 1.3vw, 0.78rem);
+      font-weight: 300; letter-spacing: 0.28em;
+      text-transform: uppercase; color: var(--muted);
+      opacity: 0;
+      transition: opacity 1s ease 1.4s;
+    }
+    .active .end-sub { opacity: 1; }
+
+    /* Progress + dots */
+    #progress-bar {
+      position: fixed; bottom: 0; left: 0;
+      height: 2px; background: var(--gold);
+      width: 0%; z-index: 100;
+      transition: width linear;
+    }
+    #dots {
+      position: fixed; bottom: 1.6rem; left: 50%;
+      transform: translateX(-50%);
+      display: flex; gap: 9px; z-index: 100;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      border: 1px solid rgba(201,168,76,0.45);
+      background: transparent; cursor: pointer;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .dot.active {
+      background: var(--gold);
+      border-color: var(--gold);
+    }
+
+    #watermark {
+      position: fixed; top: 1.4rem; right: 1.5rem;
+      font-size: 0.58rem; font-weight: 400;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(201,168,76,0.35); z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <div id="stage">
+
+    <!-- SCENE 1: Skyline champagne -->
+    <div class="scene active" id="s1" data-duration="5200">
+      <video autoplay muted loop playsinline class="scene-bg">
+        <source src="champagne-skyline.mp4" type="video/mp4">
+      </video>
+      <div class="scene-overlay" style="background:rgba(10,9,8,0.38)"></div>
+      <div class="scene-text">
+        <span class="eyebrow">Atlanta</span>
+        <h1 class="headline">Raises a<br><em>glass.</em></h1>
+      </div>
+    </div>
+
+    <!-- SCENE 2: Skyline champagne continued -->
+    <div class="scene" id="s2" data-duration="5500">
+      <video autoplay muted loop playsinline class="scene-bg">
+        <source src="champagne-skyline.mp4" type="video/mp4">
+      </video>
+      <div class="scene-overlay" style="background:rgba(10,9,8,0.45)"></div>
+      <div class="scene-text">
+        <span class="eyebrow">Thirty-Three Years</span>
+        <h1 class="headline">One quiet<br><em>empire.</em></h1>
+      </div>
+    </div>
+
+    <!-- SCENE 3: Atlanta hero -->
+    <div class="scene" id="s3" data-duration="5800">
+      <video autoplay muted loop playsinline class="scene-bg">
+        <source src="atlanta-hero.mp4" type="video/mp4">
+      </video>
+      <div class="scene-overlay" style="background:rgba(10,9,8,0.42)"></div>
+      <div class="scene-text">
+        <span class="eyebrow">A Private Celebration</span>
+        <h1 class="headline">Leonard<br><em>Wright</em></h1>
+        <p class="sub">Built it. Led it. Sold it.</p>
+      </div>
+    </div>
+
+    <!-- SCENE 4: Elegant coupe + details -->
+    <div class="scene" id="s4" data-duration="7000">
+      <video autoplay muted loop playsinline class="scene-bg">
+        <source src="champagne-elegant.mp4" type="video/mp4">
+      </video>
+      <div class="scene-overlay" style="background:rgba(10,9,8,0.55)"></div>
+      <div class="scene-text">
+        <span class="eyebrow">Summerour Studio</span>
+        <h1 class="headline" style="font-size: clamp(1.9rem, 5vw, 3.2rem);">You're<br><em>Invited</em></h1>
+        <div class="gold-rule"></div>
+        <div class="details-card">
+          409 Bishop Street NW<br>
+          Atlanta, Georgia 30318<br><br>
+          <strong>August 21, 2026 &nbsp;·&nbsp; 6:00 PM</strong><br>
+          Attire: Dress to Impress
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 5: End card -->
+    <div class="scene" id="s5" data-duration="5000">
+      <div class="scene-overlay" style="background:rgba(10,9,8,0.92)"></div>
+      <div class="end-card">
+        <svg class="end-logo" width="158" height="28" viewBox="0 0 158 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="INPAX">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M34.654 26.7491V0.276344H29.7731V26.7491H34.654ZM60.1394 16.6894L47.3595 0.276344H43.3727V26.7491H48.2909V8.89889L62.0024 26.7869V26.7491H65.0576V0.238525H60.1394V16.6894ZM78.2102 5.00362H85.5875C91.8471 5.00362 91.8843 14.3825 85.5875 14.3825H78.2102V5.00362ZM85.5875 0.238525C81.489 0.238525 77.3904 0.276344 73.2919 0.276344V26.7491H78.2102V18.9585H85.5875C98.3674 18.9585 98.3302 0.238525 85.5875 0.238525ZM122.921 26.7491H128.287L116.587 0.276344H111.222L99.5225 26.7491H104.851L107.086 21.7571H120.723L122.921 26.7491ZM118.748 17.1054H109.061L113.905 5.83562L118.748 17.1054ZM145.016 10.1469L138.496 0.276344H133.093V0.503253L141.886 13.3614L132.832 26.5978V26.7491H138.347L145.016 16.8029L151.685 26.7491H157.2V26.5978L148.109 13.3614L156.939 0.503253V0.276344H151.536L145.016 10.1469Z" fill="#F5F1E6"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H5.73013L15.0367 13.5952L5.73013 27.1904H0L9.45683 13.584L0 0Z" fill="#FB8500"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M7.72415 0H13.4543L22.7609 13.5952L13.4543 27.1904H7.72415L17.181 13.584L7.72415 0Z" fill="#FB8500"/>
+        </svg>
+        <div class="end-tagline">A night of gratitude</div>
+        <div class="end-sub">Leonard Wright · Atlanta</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="progress-bar"></div>
+  <div id="dots"></div>
+  <div id="watermark">Rain Cinematic</div>
+
+  <script>
+    const scenes = Array.from(document.querySelectorAll('.scene'));
+    const progressBar = document.getElementById('progress-bar');
+    const dotsContainer = document.getElementById('dots');
+    let current = 0;
+    let timer = null;
+    let startTime = null;
+    let duration = 0;
+
+    // Create dots
+    scenes.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goTo(i));
+      dotsContainer.appendChild(dot);
+    });
+    const dots = Array.from(document.querySelectorAll('.dot'));
+
+    function goTo(index) {
+      if (index === current) return;
+      scenes[current].classList.remove('active');
+      dots[current].classList.remove('active');
+
+      // Pause all videos except the new one
+      scenes.forEach((s, i) => {
+        const v = s.querySelector('video');
+        if (v) {
+          if (i === index) {
+            v.currentTime = 0;
+            v.play().catch(() => {});
+          } else {
+            v.pause();
+          }
+        }
+      });
+
+      current = index;
+      scenes[current].classList.add('active');
+      dots[current].classList.add('active');
+      duration = parseInt(scenes[current].dataset.duration) || 5000;
+      startTime = performance.now();
+      progressBar.style.transition = 'none';
+      progressBar.style.width = '0%';
+      requestAnimationFrame(() => {
+        progressBar.style.transition = `width ${duration}ms linear`;
+        progressBar.style.width = '100%';
+      });
+      clearTimeout(timer);
+      timer = setTimeout(next, duration);
+    }
+
+    function next() {
+      const nextIndex = (current + 1) % scenes.length;
+      goTo(nextIndex);
+    }
+
+    // Init
+    duration = parseInt(scenes[0].dataset.duration) || 5000;
+    startTime = performance.now();
+    progressBar.style.transition = `width ${duration}ms linear`;
+    progressBar.style.width = '100%';
+    timer = setTimeout(next, duration);
+
+    // Ensure first video is playing
+    const firstVideo = scenes[0].querySelector('video');
+    if (firstVideo) firstVideo.play().catch(() => {});
+  </script>
+</body>
+</html>
