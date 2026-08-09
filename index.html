@@ -1,325 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leonard Wright — A Private Celebration</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --black: #0a0908;
-      --cream: #F5F1E6;
-      --gold: #C9A84C;
-      --gold-soft: #E2CA8A;
-      --muted: rgba(245,241,230,0.55);
-    }
-    html, body {
-      width: 100%; height: 100%;
-      background: var(--black);
-      color: var(--cream);
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      overflow: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-    #stage { position: fixed; inset: 0; background: var(--black); }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Leonard Wright — A Private Celebration</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Dancing+Script:wght@600;700&family=Inter:wght@300;400;500&display=swap');
 
-    .scene {
-      position: absolute; inset: 0;
-      opacity: 0;
-      transition: opacity 1.5s ease;
-      display: flex; align-items: center; justify-content: center;
-      pointer-events: none;
-    }
-    .scene.active { opacity: 1; pointer-events: auto; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .scene-bg {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
+  :root {
+    --navy-deep: #08101f;
+    --navy: #0d1d38;
+    --navy-glow: #1a3a6b;
+    --gold: #e0b872;
+    --gold-bright: #f4e4c1;
+    --text: #f5f0e8;
+  }
 
-    .scene-overlay {
-      position: absolute; inset: 0;
-      background: rgba(10,9,8,0.48);
-    }
+  html { scroll-behavior: smooth; }
 
-    .scene-text {
-      position: relative; z-index: 10;
-      text-align: center; padding: 2rem;
-      max-width: 90vw;
-    }
+  body {
+    background: var(--navy-deep);
+    font-family: 'Inter', system-ui, sans-serif;
+    color: var(--text);
+  }
 
-    .eyebrow {
-      font-size: clamp(0.55rem, 1.25vw, 0.75rem);
-      font-weight: 400; letter-spacing: 0.36em;
-      text-transform: uppercase; color: var(--gold);
-      display: block; margin-bottom: 1.1rem;
-      opacity: 0; transform: translateY(12px);
-      transition: opacity 1s ease 0.7s, transform 1s ease 0.7s;
-    }
-    .active .eyebrow { opacity: 1; transform: none; }
+  section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    padding: 3rem 1.6rem;
+  }
 
-    .headline {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-weight: 400;
-      font-size: clamp(2.4rem, 7vw, 4.8rem);
-      line-height: 1.12;
-      letter-spacing: 0.01em;
-      color: var(--cream);
-      opacity: 0; transform: translateY(18px);
-      transition: opacity 1.15s ease 0.95s, transform 1.15s ease 0.95s;
-    }
-    .active .headline { opacity: 1; transform: none; }
-    .headline em {
-      font-style: italic;
-      font-weight: 300;
-      color: var(--gold-soft);
-    }
+  .bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+  }
 
-    .sub {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-weight: 300;
-      font-size: clamp(1.05rem, 2.4vw, 1.45rem);
-      letter-spacing: 0.03em;
-      color: rgba(245,241,230,0.85);
-      margin-top: 1.1rem;
-      opacity: 0; transform: translateY(10px);
-      transition: opacity 1s ease 1.25s, transform 1s ease 1.25s;
-    }
-    .active .sub { opacity: 1; transform: none; }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
 
-    .gold-rule {
-      width: 42px; height: 1px;
-      background: var(--gold);
-      margin: 1.4rem auto 0;
-      opacity: 0;
-      transition: opacity 0.9s ease 1.35s;
-    }
-    .active .gold-rule { opacity: 0.7; }
+  /* ---------- SLIDE 1: searchlight opener ---------- */
+  #s1 {
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 12%, rgba(60,110,190,0.38), transparent 60%),
+      linear-gradient(to bottom, #0d1d38 0%, #08101f 70%);
+  }
 
-    .details-card {
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: clamp(0.82rem, 1.7vw, 1.05rem);
-      line-height: 1.85;
-      letter-spacing: 0.06em;
-      color: rgba(245,241,230,0.88);
-      margin-top: 1.8rem;
-      opacity: 0; transform: translateY(12px);
-      transition: opacity 1s ease 1.3s, transform 1s ease 1.3s;
-    }
-    .active .details-card { opacity: 1; transform: none; }
-    .details-card strong {
-      font-weight: 500;
-      color: var(--cream);
-      letter-spacing: 0.08em;
-    }
+  /* Sweeping searchlight beams */
+  .beams { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
+  .beam {
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    width: 42vw;
+    height: 150vh;
+    background: linear-gradient(to bottom, rgba(190,215,255,0.16), rgba(190,215,255,0) 65%);
+    transform-origin: top center;
+    filter: blur(6px);
+    mix-blend-mode: screen;
+  }
+  .beam.b1 { animation: sweepL 7s ease-in-out infinite alternate; }
+  .beam.b2 { animation: sweepR 8s ease-in-out infinite alternate; opacity: 0.75; }
+  .beam.b3 { animation: sweepC 9s ease-in-out infinite alternate; opacity: 0.5; width: 30vw; }
 
-    .end-card {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      z-index: 10;
-    }
-    .end-logo {
-      height: clamp(22px, 4vw, 32px);
-      width: auto;
-      opacity: 0;
-      transition: opacity 1.6s ease 0.6s;
-      margin-bottom: 1.8rem;
-    }
-    .active .end-logo { opacity: 0.55; }
+  @keyframes sweepL { from { transform: rotate(-26deg);} to { transform: rotate(-6deg);} }
+  @keyframes sweepR { from { transform: rotate(24deg);} to { transform: rotate(6deg);} }
+  @keyframes sweepC { from { transform: rotate(-8deg);} to { transform: rotate(10deg);} }
 
-    .end-tagline {
-      font-family: 'Cormorant Garamond', Georgia, serif;
-      font-size: clamp(1.6rem, 4vw, 2.6rem);
-      font-weight: 400;
-      letter-spacing: 0.06em;
-      color: var(--cream);
-      opacity: 0; transform: translateY(14px);
-      transition: opacity 1.2s ease 1s, transform 1.2s ease 1s;
-      margin-bottom: 0.6rem;
-    }
-    .active .end-tagline { opacity: 1; transform: none; }
+  .glow-floor {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 32%;
+    background: linear-gradient(to top, rgba(40,80,150,0.5), transparent);
+    z-index: 0;
+  }
 
-    .end-sub {
-      font-size: clamp(0.6rem, 1.3vw, 0.78rem);
-      font-weight: 300; letter-spacing: 0.28em;
-      text-transform: uppercase; color: var(--muted);
-      opacity: 0;
-      transition: opacity 1s ease 1.4s;
-    }
-    .active .end-sub { opacity: 1; }
+  .content { position: relative; z-index: 3; max-width: 680px; }
 
-    #progress-bar {
-      position: fixed; bottom: 0; left: 0;
-      height: 2px; background: var(--gold);
-      width: 0%; z-index: 100;
-      transition: width linear;
-    }
-    #dots {
-      position: fixed; bottom: 1.6rem; left: 50%;
-      transform: translateX(-50%);
-      display: flex; gap: 9px; z-index: 100;
-    }
-    .dot {
-      width: 6px; height: 6px; border-radius: 50%;
-      border: 1px solid rgba(201,168,76,0.45);
-      background: transparent; cursor: pointer;
-      transition: background 0.3s, border-color 0.3s;
-    }
-    .dot.active {
-      background: var(--gold);
-      border-color: var(--gold);
-    }
+  .eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: clamp(0.7rem, 1.5vw, 0.82rem);
+    letter-spacing: 0.42em;
+    text-transform: uppercase;
+    color: rgba(224,184,114,0.9);
+    margin-bottom: 1.6rem;
+  }
 
-    #watermark {
-      position: fixed; top: 1.4rem; right: 1.5rem;
-      font-size: 0.58rem; font-weight: 400;
-      letter-spacing: 0.22em; text-transform: uppercase;
-      color: rgba(201,168,76,0.35); z-index: 100;
-    }
-  </style>
+  .name-bold {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 900;
+    font-size: clamp(3.4rem, 13vw, 7rem);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-shadow: 0 4px 40px rgba(0,0,0,0.6);
+  }
+
+  .name-script {
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: clamp(3.2rem, 12vw, 6.4rem);
+    line-height: 1;
+    color: var(--gold);
+    text-shadow: 0 2px 30px rgba(224,184,114,0.35);
+    margin-top: -0.1em;
+  }
+
+  .kicker {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+    letter-spacing: 0.04em;
+    color: rgba(245,240,232,0.82);
+    margin-top: 1.8rem;
+  }
+
+  /* ---------- SLIDE 2 & 3 shared ---------- */
+  .statement {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: clamp(2.6rem, 9vw, 5rem);
+    line-height: 1.0;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+    color: var(--text);
+    text-shadow: 0 3px 30px rgba(0,0,0,0.6);
+  }
+
+  .statement .accent {
+    display: block;
+    font-family: 'Dancing Script', cursive;
+    font-weight: 700;
+    font-size: clamp(2.8rem, 10vw, 5.4rem);
+    text-transform: none;
+    color: var(--gold);
+    letter-spacing: 0;
+    margin-top: 0.05em;
+  }
+
+  .line {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: clamp(0.98rem, 2.3vw, 1.25rem);
+    letter-spacing: 0.03em;
+    color: rgba(245,240,232,0.88);
+    margin-top: 1.5rem;
+    max-width: 30ch;
+  }
+
+  #s2 .scrim {
+    background: linear-gradient(to bottom, rgba(8,16,31,0.55), rgba(8,16,31,0.35) 45%, rgba(8,16,31,0.8));
+  }
+
+  #s3 .scrim {
+    background: linear-gradient(to bottom, rgba(8,16,31,0.5), rgba(8,16,31,0.4) 40%, rgba(8,16,31,0.82));
+  }
+
+  /* ---------- Details block on slide 3 ---------- */
+  .venue {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+    letter-spacing: 0.01em;
+    color: var(--text);
+    margin-bottom: 0.2rem;
+  }
+
+  .divider {
+    width: 46px; height: 1px;
+    background: rgba(224,184,114,0.6);
+    margin: 1.2rem auto;
+  }
+
+  .details {
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: clamp(0.9rem, 1.9vw, 1.05rem);
+    line-height: 1.9;
+    letter-spacing: 0.05em;
+    color: rgba(245,240,232,0.9);
+  }
+
+  .details strong {
+    font-weight: 500;
+    color: var(--gold);
+    letter-spacing: 0.06em;
+  }
+
+  .logo-wrap { margin-top: 2.4rem; opacity: 0.8; }
+  .logo-wrap svg { height: 24px; width: auto; }
+
+  /* ---------- scroll reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 1s ease, transform 1s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .beam { animation: none; }
+    .reveal { transition: opacity 0.4s ease; transform: none; }
+  }
+</style>
 </head>
 <body>
-  <div id="stage">
 
-    <!-- SCENE 1: Skyline champagne (hero) -->
-    <div class="scene active" id="s1" data-duration="5200">
-      <video autoplay muted loop playsinline class="scene-bg">
-        <source src="champagne-skyline.mp4" type="video/mp4">
-      </video>
-      <div class="scene-overlay" style="background:rgba(10,9,8,0.38)"></div>
-      <div class="scene-text">
-        <span class="eyebrow">Atlanta</span>
-        <h1 class="headline">Raises a<br><em>glass.</em></h1>
-      </div>
+  <!-- SLIDE 1 — Searchlight opener, name on front -->
+  <section id="s1">
+    <div class="beams">
+      <div class="beam b1"></div>
+      <div class="beam b2"></div>
+      <div class="beam b3"></div>
     </div>
-
-    <!-- SCENE 2: STATIC -->
-    <div class="scene" id="s2" data-duration="4800">
-      <div class="scene-overlay" style="background:rgba(10,9,8,0.92)"></div>
-      <div class="scene-text">
-        <span class="eyebrow">Thirty-Three Years</span>
-        <h1 class="headline">One quiet<br><em>empire.</em></h1>
-      </div>
+    <div class="glow-floor"></div>
+    <div class="content reveal in">
+      <div class="eyebrow">A Private Celebration</div>
+      <div class="name-bold">Leonard</div>
+      <div class="name-script">Wright</div>
+      <div class="kicker">Thirty-three years. Built from nothing.</div>
     </div>
+  </section>
 
-    <!-- SCENE 3: Atlanta hero (shortened – no loop) -->
-    <div class="scene" id="s3" data-duration="4800">
-      <video autoplay muted playsinline class="scene-bg">
-        <source src="atlanta-hero.mp4" type="video/mp4">
-      </video>
-      <div class="scene-overlay" style="background:rgba(10,9,8,0.42)"></div>
-      <div class="scene-text">
-        <span class="eyebrow">A Private Celebration</span>
-        <h1 class="headline">Leonard<br><em>Wright</em></h1>
-        <p class="sub">Built it. Led it. Sold it.</p>
-      </div>
+  <!-- SLIDE 2 — Atlanta hero -->
+  <section id="s2">
+    <video class="bg-video" autoplay muted loop playsinline>
+      <source src="atlanta-hero.mp4" type="video/mp4" />
+    </video>
+    <div class="scrim"></div>
+    <div class="content reveal">
+      <div class="statement">The Empire Is<span class="accent">Sold.</span></div>
+      <div class="line">Now we celebrate the man who built it.</div>
     </div>
+  </section>
 
-    <!-- SCENE 4: Elegant coupe -->
-    <div class="scene" id="s4" data-duration="7000">
-      <video autoplay muted loop playsinline class="scene-bg">
-        <source src="champagne-elegant.mp4" type="video/mp4">
-      </video>
-      <div class="scene-overlay" style="background:rgba(10,9,8,0.55)"></div>
-      <div class="scene-text">
-        <span class="eyebrow">Summerour Studio</span>
-        <h1 class="headline" style="font-size: clamp(1.9rem, 5vw, 3.2rem);">You're<br><em>Invited</em></h1>
-        <div class="gold-rule"></div>
-        <div class="details-card">
-          409 Bishop Street NW<br>
-          Atlanta, Georgia 30318<br><br>
-          <strong>August 21, 2026 &nbsp;·&nbsp; 6:00 PM</strong><br>
-          Attire: Dress to Impress
-        </div>
+  <!-- SLIDE 3 — Champagne pour + details -->
+  <section id="s3">
+    <video class="bg-video" autoplay muted loop playsinline>
+      <source src="champagne-pour.mp4" type="video/mp4" />
+    </video>
+    <div class="scrim"></div>
+    <div class="content reveal">
+      <div class="venue">Summerour Studio</div>
+      <div class="divider"></div>
+      <div class="details">
+        409 Bishop Street NW<br>
+        Atlanta, Georgia 30318<br><br>
+        <strong>August 21, 2026 &nbsp;·&nbsp; 6:00 PM</strong><br>
+        Attire: Dress to Impress
       </div>
-    </div>
-
-    <!-- SCENE 5: End card -->
-    <div class="scene" id="s5" data-duration="5000">
-      <div class="scene-overlay" style="background:rgba(10,9,8,0.92)"></div>
-      <div class="end-card">
-        <svg class="end-logo" width="158" height="28" viewBox="0 0 158 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="INPAX">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M34.654 26.7491V0.276344H29.7731V26.7491H34.654ZM60.1394 16.6894L47.3595 0.276344H43.3727V26.7491H48.2909V8.89889L62.0024 26.7869V26.7491H65.0576V0.238525H60.1394V16.6894ZM78.2102 5.00362H85.5875C91.8471 5.00362 91.8843 14.3825 85.5875 14.3825H78.2102V5.00362ZM85.5875 0.238525C81.489 0.238525 77.3904 0.276344 73.2919 0.276344V26.7491H78.2102V18.9585H85.5875C98.3674 18.9585 98.3302 0.238525 85.5875 0.238525ZM122.921 26.7491H128.287L116.587 0.276344H111.222L99.5225 26.7491H104.851L107.086 21.7571H120.723L122.921 26.7491ZM118.748 17.1054H109.061L113.905 5.83562L118.748 17.1054ZM145.016 10.1469L138.496 0.276344H133.093V0.503253L141.886 13.3614L132.832 26.5978V26.7491H138.347L145.016 16.8029L151.685 26.7491H157.2V26.5978L148.109 13.3614L156.939 0.503253V0.276344H151.536L145.016 10.1469Z" fill="#F5F1E6"/>
+      <div class="logo-wrap">
+        <svg width="158" height="28" viewBox="0 0 158 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="INPAX">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M34.654 26.7491V0.276344H29.7731V26.7491H34.654ZM60.1394 16.6894L47.3595 0.276344H43.3727V26.7491H48.2909V8.89889L62.0024 26.7869V26.7491H65.0576V0.238525H60.1394V16.6894ZM78.2102 5.00362H85.5875C91.8471 5.00362 91.8843 14.3825 85.5875 14.3825H78.2102V5.00362ZM85.5875 0.238525C81.489 0.238525 77.3904 0.276344 73.2919 0.276344V26.7491H78.2102V18.9585H85.5875C98.3674 18.9585 98.3302 0.238525 85.5875 0.238525ZM122.921 26.7491H128.287L116.587 0.276344H111.222L99.5225 26.7491H104.851L107.086 21.7571H120.723L122.921 26.7491ZM118.748 17.1054H109.061L113.905 5.83562L118.748 17.1054ZM145.016 10.1469L138.496 0.276344H133.093V0.503253L141.886 13.3614L132.832 26.5978V26.7491H138.347L145.016 16.8029L151.685 26.7491H157.2V26.5978L148.109 13.3614L156.939 0.503253V0.276344H151.536L145.016 10.1469Z" fill="#f5f0e8"/>
           <path fill-rule="evenodd" clip-rule="evenodd" d="M0 0H5.73013L15.0367 13.5952L5.73013 27.1904H0L9.45683 13.584L0 0Z" fill="#FB8500"/>
           <path fill-rule="evenodd" clip-rule="evenodd" d="M7.72415 0H13.4543L22.7609 13.5952L13.4543 27.1904H7.72415L17.181 13.584L7.72415 0Z" fill="#FB8500"/>
         </svg>
-        <div class="end-tagline">A night of gratitude</div>
-        <div class="end-sub">Leonard Wright · Atlanta</div>
       </div>
     </div>
-
-  </div>
-
-  <div id="progress-bar"></div>
-  <div id="dots"></div>
-  <div id="watermark">Rain Cinematic</div>
+  </section>
 
   <script>
-    const scenes = Array.from(document.querySelectorAll('.scene'));
-    const progressBar = document.getElementById('progress-bar');
-    const dotsContainer = document.getElementById('dots');
-    let current = 0;
-    let timer = null;
-
-    scenes.forEach((_, i) => {
-      const dot = document.createElement('div');
-      dot.className = 'dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => goTo(i));
-      dotsContainer.appendChild(dot);
-    });
-    const dots = Array.from(document.querySelectorAll('.dot'));
-
-    function goTo(index) {
-      if (index === current) return;
-      scenes[current].classList.remove('active');
-      dots[current].classList.remove('active');
-
-      scenes.forEach((s, i) => {
-        const v = s.querySelector('video');
-        if (v) {
-          if (i === index) {
-            v.currentTime = 0;
-            v.play().catch(() => {});
-          } else {
-            v.pause();
-          }
-        }
-      });
-
-      current = index;
-      scenes[current].classList.add('active');
-      dots[current].classList.add('active');
-      const duration = parseInt(scenes[current].dataset.duration) || 5000;
-      progressBar.style.transition = 'none';
-      progressBar.style.width = '0%';
-      requestAnimationFrame(() => {
-        progressBar.style.transition = `width ${duration}ms linear`;
-        progressBar.style.width = '100%';
-      });
-      clearTimeout(timer);
-      timer = setTimeout(next, duration);
-    }
-
-    function next() {
-      const nextIndex = (current + 1) % scenes.length;
-      goTo(nextIndex);
-    }
-
-    // Init
-    const firstDuration = parseInt(scenes[0].dataset.duration) || 5000;
-    progressBar.style.transition = `width ${firstDuration}ms linear`;
-    progressBar.style.width = '100%';
-    timer = setTimeout(next, firstDuration);
-
-    const firstVideo = scenes[0].querySelector('video');
-    if (firstVideo) firstVideo.play().catch(() => {});
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.reveal').forEach(r => io.observe(r));
   </script>
 </body>
 </html>
